@@ -3,6 +3,8 @@ arduino_pomodorotechnique
 
 This code runs a simple gadget to control a Pomodoro on Arduino.
 
+![breadboard](https://pbs.twimg.com/media/A8phqKlCEAEXjVh.jpg:small)
+
 ## Hardware Prerequisites
 
 * Arduino
