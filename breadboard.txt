@@ -1,0 +1,6 @@
+Breadboard #: 01
+Pin Connections:
+    * 11 -> Red Light
+    * 10 -> Yellow Light
+    * 9  -> Green Light
+    * 6 -> Buzzer
