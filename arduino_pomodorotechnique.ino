@@ -46,11 +46,11 @@ External Source Code:
 
 #include "pitches.h"
 
-const unsigned long minute = 1000;
+const unsigned long minute = 60000;
 const int fast_beep_mills = 30;
 const int minute_alert_beep_mills = 300;
 const int buzz = 6;
-const int buzz_volume = 2; //0-255 via analogWrite
+const int buzz_volume = 100; //0-255 via analogWrite
 const int min_time_frame_mills = fast_beep_mills;
 
 unsigned long start_time, actual_time;
@@ -62,8 +62,8 @@ int led_pin[] = { 11, 10, 9 };
 int turnon_led_minute[] = { 0, 20, 25 };
 int restart_on_minute = 30;
 
-int beep_minute[]       = { 20, 21, 22, 23, 24, 25 };
-int beep_minute_status[] = { 0,  0,  0,  0,  0,  0 };
+int beep_minute[]       =  { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 };
+int beep_minute_status[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 };
 int i;
 
 void setup(){
@@ -87,7 +87,7 @@ void loop() {
   update_timers();
   check_leds();
   check_beeps();
-  //debug();
+  debug();
   check_restart();
   delay(min_time_frame_mills);
 }
