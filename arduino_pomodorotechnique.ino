@@ -44,22 +44,23 @@ External Source Code:
 
 */
 
-#include "pitches.h"
+#include "multplex_seven_seg_display.h"
 
 const unsigned long minute = 60000;
-const int fast_beep_mills = 30;
-const int minute_alert_beep_mills = 300;
-const int buzz = 6;
+const int fast_beep_mills = 10;
+const int minute_alert_beep_mills = 1;
+const int buzz = 2;
 const int buzz_volume = 100; //0-255 via analogWrite
-const int min_time_frame_mills = fast_beep_mills;
 
 unsigned long start_time, actual_time;
-unsigned long time_elapsed, time_elapsed_in_minute;
+unsigned long time_elapsed, time_elapsed_in_minute, seconds;
 unsigned long beep_timer = 0;
 unsigned long restart_time;
 
-int led_pin[] = { 11, 10, 9 };
-int turnon_led_minute[] = { 0, 20, 25 };
+//int led_pin[] = { 11, 10, 9 };
+int led_pin[] = {  };
+//int turnon_led_minute[] = { 0, 20, 25 };
+int turnon_led_minute[] = {  };
 int restart_on_minute = 30;
 
 int beep_minute[]       =  { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 };
@@ -67,12 +68,14 @@ int beep_minute_status[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0,  0,  0,  0,  0,  0,  0, 
 int i;
 
 void setup(){
+  display_setup();
+
   pinMode(buzz, OUTPUT); 
   for (i = 0; i < (sizeof(led_pin)/sizeof(int)); i++) {
     pinMode(led_pin[i], OUTPUT); 
   }
   Serial.begin(9600);
-  mytone(NOTE_A4, fast_beep_mills);
+  mytone(fast_beep_mills);
   setup_start();
 }
 
@@ -89,13 +92,14 @@ void loop() {
   check_beeps();
   debug();
   check_restart();
-  delay(min_time_frame_mills);
+  display_displayNumber( (time_elapsed_in_minute*100) + seconds);
 }
 
 void update_timers() {
   actual_time = millis();
   time_elapsed = actual_time - start_time;
   time_elapsed_in_minute = time_elapsed / minute;
+  seconds = ( time_elapsed - (time_elapsed_in_minute * minute) ) /1000;
 }
 
 void check_leds() {
@@ -110,7 +114,7 @@ void check_leds() {
 void check_beeps() {
   for (i = 0; i < (sizeof(beep_minute)/sizeof(int)); i++) {
      if (time_elapsed_in_minute >= beep_minute[i] && beep_minute_status[i] == 0) {
-       analogWrite(buzz, buzz_volume);
+       digitalWrite(buzz, HIGH);
        beep_minute_status[i] = 1;
        beep_timer = actual_time + minute_alert_beep_mills;
      }
@@ -122,17 +126,20 @@ void check_beeps() {
 
 void check_restart() {
   if (actual_time >= restart_time) {
-    mytone(NOTE_A7, fast_beep_mills*2);
+    mytone(fast_beep_mills*2);
     setup_start();
   }
 }
 
-void mytone(int note, int duration) {
+void mytone(int duration) {
   for (i = 0; i < 3; i++) {
-    tone(buzz, note, duration);
+    digitalWrite(buzz, HIGH);
+    delay(duration*2);
+    digitalWrite(buzz, LOW);
     delay(duration*2);
   }
 }
+
 
 void debug() {
   Serial.print(actual_time);
