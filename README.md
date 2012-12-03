@@ -3,14 +3,23 @@ arduino_pomodorotechnique
 
 This code runs a simple gadget to control a Pomodoro on Arduino.
 
-![breadboard](https://pbs.twimg.com/media/A8phqKlCEAEXjVh.jpg:small)
-![breadboard](https://raw.github.com/bilouro/arduino_pomodorotechnique/master/circuitproject01.jpg)
+![breadboard](https://raw.github.com/bilouro/arduino_pomodorotechnique/master/photo-front.jpg:small)
+![breadboard](https://raw.github.com/bilouro/arduino_pomodorotechnique/master/photo-back.jpg:small)
+![breadboard](https://raw.github.com/bilouro/arduino_pomodorotechnique/master/circuit02.jpg:small)
 
 ## Hardware Prerequisites
 
-* Arduino
-* 3 leds + 3 Resistors (200 ~ 600 Ohms)
-* 1 Buzzer
+- 01 arduino;
+- 01 rgb-led; (+3 (220Ohms) resistors)
+- 01 buzz;
+- 02 push-button;
+- 01 potentiometer
+- 02 female-socket (8 pins, 10 pins)
+- 01 4 digit 7 segments display
+- 01 SN7447n (IC BCD-to-7segments)
+- 01 board
+- 17 wires
+
 
 ## Get Started With Pomodoro Technique
 

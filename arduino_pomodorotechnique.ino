@@ -36,8 +36,15 @@ Description: This code enables to do a Pomodoro.
 
 External Requirements:
 - 01 arduino;
-- 03 leds connected on pwd ports;
+- 01 rgb-led; (+3 (220Ohms) resistors)
 - 01 buzz;
+- 02 push-button;
+- 01 potentiometer
+- 02 female-socket (8 pins, 10 pins)
+- 01 4 digit 7 segments display
+- 01 SN7447n (IC BCD-to-7segments)
+- 01 board
+- 17 wires
 
 External Source Code:
 - (http://arduino.cc/en/Tutorial/Tone)
@@ -47,50 +54,74 @@ External Source Code:
 #include "multplex_seven_seg_display.h"
 
 const unsigned long minute = 60000;
-const int fast_beep_mills = 10;
+const int fast_beep_mills = 5;
 const int minute_alert_beep_mills = 1;
-const int buzz = 2;
-const int buzz_volume = 100; //0-255 via analogWrite
-
+const int buzz = A0;
+const int pb1 = A2;
+const int pb2 = A3;
+const int potentiometer = A1;
 unsigned long start_time, actual_time;
 unsigned long time_elapsed, time_elapsed_in_minute, seconds;
 unsigned long beep_timer = 0;
 unsigned long restart_time;
 
-//int led_pin[] = { 11, 10, 9 };
-int led_pin[] = {  };
-//int turnon_led_minute[] = { 0, 20, 25 };
-int turnon_led_minute[] = {  };
+int rgb_led_pin_list[] = { 11, 10, 9 };
+int color_change_list[] = { 0, 20, 25 }; //1 change per minute only.
+const int color_set[3][3] =  { //must have item here per each item in color_change_list
+         {
+                255, //r
+                0,  //g
+                0,  //b
+         },
+         {
+                150, //r
+                150,  //g
+                0,  //b
+         },
+         {
+                0,  //r
+                255,  //g
+                0,  //b
+         }};
+
+
 int restart_on_minute = 30;
 
-int beep_minute[]       =  { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 };
-int beep_minute_status[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 };
-int i;
+int beep_list[]       =  { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 };
+int beep_status_list[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 }; //must follows beep_list
+int i, change, color;
 
 void setup(){
   display_setup();
 
-  pinMode(buzz, OUTPUT); 
-  for (i = 0; i < (sizeof(led_pin)/sizeof(int)); i++) {
-    pinMode(led_pin[i], OUTPUT); 
+  //Serial.begin(9600);
+
+  pinMode(buzz, OUTPUT);
+  pinMode(pb1, INPUT_PULLUP); 
+  pinMode(pb2, INPUT_PULLUP); 
+  
+  for (i = 0; i < (sizeof(rgb_led_pin_list)/sizeof(int)); i++) {
+    pinMode(rgb_led_pin_list[i], OUTPUT);
   }
-  Serial.begin(9600);
-  mytone(fast_beep_mills);
+
+  play_beep(fast_beep_mills);
   setup_start();
 }
 
 void setup_start(){
   start_time = millis();
   restart_time = start_time + ( restart_on_minute * minute );
-  for (i = 0; i < (sizeof(beep_minute_status)/sizeof(int)); i++) 
-    beep_minute_status[i] = 0;
+  for (i = 0; i < (sizeof(beep_status_list)/sizeof(int)); i++)
+    beep_status_list[i] = 0;
 }
 
 void loop() {
+  check_display_brightness();
+  check_buttons();
   update_timers();
   check_leds();
   check_beeps();
-  debug();
+  //debug();
   check_restart();
   display_displayNumber( (time_elapsed_in_minute*100) + seconds);
 }
@@ -102,20 +133,37 @@ void update_timers() {
   seconds = ( time_elapsed - (time_elapsed_in_minute * minute) ) /1000;
 }
 
+void check_display_brightness() {
+  display_brightness = constrain(
+                         map(analogRead(potentiometer), 0, 1024, 30, 3000),
+                         30, 3000);
+}
+
+void check_buttons() {
+  int button1 = digitalRead(pb1);
+  if (button1 == LOW) {
+    //wait for button release 
+    while (digitalRead(pb1) == LOW) delay(500);
+    restart();
+  }
+}
+
 void check_leds() {
-  for (i = 0; i < (sizeof(turnon_led_minute)/sizeof(int)); i++) {
-     if (time_elapsed_in_minute >= turnon_led_minute[i])
-       digitalWrite(led_pin[i], HIGH);
+  for (change = 0; change < (sizeof(color_change_list)/sizeof(int)); change++) {
+    if (time_elapsed_in_minute >= color_change_list[change])
+       for (color = 0; color < (sizeof(rgb_led_pin_list)/sizeof(int)); color++)
+         analogWrite(rgb_led_pin_list[color], color_set[change][color]);
     else
-       digitalWrite(led_pin[i], LOW);
+       for (color = 0; color < (sizeof(rgb_led_pin_list)/sizeof(int)); color++)
+         analogWrite(rgb_led_pin_list[color], LOW);
   }
 }
 
 void check_beeps() {
-  for (i = 0; i < (sizeof(beep_minute)/sizeof(int)); i++) {
-     if (time_elapsed_in_minute >= beep_minute[i] && beep_minute_status[i] == 0) {
+  for (i = 0; i < (sizeof(beep_list)/sizeof(int)); i++) {
+     if (time_elapsed_in_minute >= beep_list[i] && beep_status_list[i] == 0) {
        digitalWrite(buzz, HIGH);
-       beep_minute_status[i] = 1;
+       beep_status_list[i] = 1;
        beep_timer = actual_time + minute_alert_beep_mills;
      }
   }
@@ -124,22 +172,25 @@ void check_beeps() {
   }
 }
 
+void restart() {
+    play_beep(fast_beep_mills*2);
+    setup_start();
+}
+
 void check_restart() {
   if (actual_time >= restart_time) {
-    mytone(fast_beep_mills*2);
-    setup_start();
+     restart();
   }
 }
 
-void mytone(int duration) {
+void play_beep(int duration) {
   for (i = 0; i < 3; i++) {
     digitalWrite(buzz, HIGH);
-    delay(duration*2);
+    delay(duration);
     digitalWrite(buzz, LOW);
-    delay(duration*2);
+    delay(duration);
   }
 }
-
 
 void debug() {
   Serial.print(actual_time);

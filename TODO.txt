@@ -1,1 +1,14 @@
+software
 * on the 4th pomodoro we need some more time for rest
+* insert a legend for board-bus
+* program the pause button
+
+hardware
+* make a female-female to connect board-arduino.
+* adjust documentation for BCD-PINS.
+* make a datasheet to board-bus
+
+community
+* sent to py-rio list
+* sent to arduino rio list
+* setn to pomodoro

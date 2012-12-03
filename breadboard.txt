@@ -1,6 +1,8 @@
-Breadboard #: 01
+Breadboard #: 02
 Pin Connections:
-    * 11 -> Red Light
-    * 10 -> Yellow Light
-    * 9  -> Green Light
-    * 6 -> Buzzer
+- rgb-led (11, 10, 9)
+- buzzer (A0)
+- push-button (A2, A3)
+- potentiometer (A1)
+- display (12, 8, 7, 6)
+- BCD-to-7seg 7447 (5, 4, 3, 2)

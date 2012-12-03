@@ -1,108 +1,73 @@
 #include "Arduino.h"
 
-const int digit[4] =  {11, 10, 9, 6}; //digit pin
-const int seg[7] =  {A1, 3, 4, 5, A0, 7, 8}; //7 segments mapping
-const int hour_separator_pin =  12;
-
+const int digit[4] =  {12, 8, 7, 6}; //digit pin
+const int seg[4] =  {4, 3, 2, 5}; //cbda -- [[ cbad]]
 int displaying, x;
 
-#define SEGMENT_ON  LOW
-#define SEGMENT_OFF HIGH
-
-//#define DISPLAY_BRIGHTNESS 5 //(15.7mA current draw per digit)
-//#define DISPLAY_BRIGHTNESS 2 //(11.4mA current draw per digit)
-#define DISPLAY_BRIGHTNESS 1 //(5.9mA current draw per digit)
-
-const int number_representation[10][7] =  {
+//int display_brightness = 5000; //(15.7mA current draw per digit)
+//int display_brightness = 2000; //(11.4mA current draw per digit)
+int display_brightness = 1000; //(5.9mA current draw per digit)
+  
+const int number_representation[10][4] =  {
          { //0
-                SEGMENT_ON,
-                SEGMENT_ON,
-                SEGMENT_ON,
-                SEGMENT_ON,
-                SEGMENT_ON,
-                SEGMENT_ON,
-                SEGMENT_OFF,
+                LOW,
+                LOW,
+                LOW,
+                LOW
          },
          { //1
-                SEGMENT_OFF,
-                SEGMENT_ON,
-                SEGMENT_ON,
-                SEGMENT_OFF,
-                SEGMENT_OFF,
-                SEGMENT_OFF,
-                SEGMENT_OFF,
+                LOW,
+                LOW,
+                LOW,
+                HIGH
          },
          { //2
-                SEGMENT_ON,
-                SEGMENT_ON,
-                SEGMENT_OFF,
-                SEGMENT_ON,
-                SEGMENT_ON,
-                SEGMENT_OFF,
-                SEGMENT_ON,
+                LOW,
+                LOW,
+                HIGH,
+                LOW
          },
          { //3
-                SEGMENT_ON,
-                SEGMENT_ON,
-                SEGMENT_ON,
-                SEGMENT_ON,
-                SEGMENT_OFF,
-                SEGMENT_OFF,
-                SEGMENT_ON,
+                LOW,
+                LOW,
+                HIGH,
+                HIGH
          },
          { //4
-                SEGMENT_OFF,
-                SEGMENT_ON,
-                SEGMENT_ON,
-                SEGMENT_OFF,
-                SEGMENT_OFF,
-                SEGMENT_ON,
-                SEGMENT_ON,
+                LOW,
+                HIGH,
+                LOW,
+                LOW
          },
          { //5
-                SEGMENT_ON,
-                SEGMENT_OFF,
-                SEGMENT_ON,
-                SEGMENT_ON,
-                SEGMENT_OFF,
-                SEGMENT_ON,
-                SEGMENT_ON,
+                LOW,
+                HIGH,
+                LOW,
+                HIGH,
          },
          { //6
-                SEGMENT_ON,
-                SEGMENT_OFF,
-                SEGMENT_ON,
-                SEGMENT_ON,
-                SEGMENT_ON,
-                SEGMENT_ON,
-                SEGMENT_ON,
+                LOW,
+                HIGH,
+                HIGH,
+                LOW,
          },
          { //7
-                SEGMENT_ON,
-                SEGMENT_ON,
-                SEGMENT_ON,
-                SEGMENT_OFF,
-                SEGMENT_OFF,
-                SEGMENT_OFF,
-                SEGMENT_OFF,
+                LOW,
+                HIGH,
+                HIGH,
+                HIGH,
          },
          { //8
-                SEGMENT_ON,
-                SEGMENT_ON,
-                SEGMENT_ON,
-                SEGMENT_ON,
-                SEGMENT_ON,
-                SEGMENT_ON,
-                SEGMENT_ON,
+                HIGH,
+                LOW,
+                LOW,
+                LOW,
          },
          { //9
-                SEGMENT_ON,
-                SEGMENT_ON,
-                SEGMENT_ON,
-                SEGMENT_ON,
-                SEGMENT_OFF,
-                SEGMENT_ON,
-                SEGMENT_ON,
+                HIGH,
+                LOW,
+                LOW,
+                HIGH,
          }
 
      };
@@ -110,10 +75,6 @@ const int number_representation[10][7] =  {
 void display_setup() {
   for (x = 0; x < (sizeof(seg)/sizeof(int)); x++)   pinMode(seg[x], OUTPUT);
   for (x = 0; x < (sizeof(digit)/sizeof(int)); x++) pinMode(digit[x], OUTPUT);
-  pinMode(A2, OUTPUT);
-  digitalWrite(A2, LOW);
-  pinMode(hour_separator_pin, OUTPUT);
-  digitalWrite(hour_separator_pin, HIGH);
 }
 
 void lightNumber(int numberToDisplay) {
@@ -129,7 +90,7 @@ void display_displayNumber(int toDisplay) {
         toDisplay /= 10;
 
         digitalWrite(digit[displaying], HIGH);
-        delay(DISPLAY_BRIGHTNESS);
+        delayMicroseconds(display_brightness);
         digitalWrite(digit[displaying], LOW);
     }
 }
