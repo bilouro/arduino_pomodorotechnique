@@ -3,9 +3,9 @@ arduino_pomodorotechnique
 
 This code runs a simple gadget to control a Pomodoro on Arduino.
 
-![breadboard](https://raw.github.com/bilouro/arduino_pomodorotechnique/master/photo-front.jpg:small)
-![breadboard](https://raw.github.com/bilouro/arduino_pomodorotechnique/master/photo-back.jpg:small)
-![breadboard](https://raw.github.com/bilouro/arduino_pomodorotechnique/master/circuit02.jpg:small)
+![breadboard](https://raw.github.com/bilouro/arduino_pomodorotechnique/master/photo-front.jpg)
+![breadboard](https://raw.github.com/bilouro/arduino_pomodorotechnique/master/photo-back.jpg)
+![breadboard](https://raw.github.com/bilouro/arduino_pomodorotechnique/master/circuit02.jpg)
 
 ## Hardware Prerequisites
 
