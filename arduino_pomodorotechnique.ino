@@ -68,6 +68,9 @@ unsigned long restart_time;
 int zigzag_num = random(1 , 254);
 int zigzag_way = random(0 , 1);
 
+int button1_state = HIGH;
+int button2_state = HIGH;
+
 int rgb_led_pin_list[] = { 11, 10, 9 };
 int color_change_list[] = { 0, 20, 25 }; //1 change per minute only.
 const int color_set[3][3] =  { //must have item here per each item in color_change_list
@@ -163,11 +166,19 @@ void check_display_brightness() {
 }
 
 void check_buttons() {
+  //wait for the user to release the button to act.
+
   int button1 = digitalRead(pb1);
-  if (button1 == LOW) {
-    //wait for button release 
-    while (digitalRead(pb1) == LOW) delay(500);
-    restart();
+  //it' is by default HIGH (cause use pull_up)
+
+  if (button1 == LOW && button1_state == HIGH) {
+    //if pressed and before was not pressed
+    button1_state = LOW;
+
+  } else if (button1 == HIGH && button1_state == LOW) {
+      //if now is UNpressed and before was pressed
+      button1_state = HIGH;
+      restart();
   }
 }
 
