@@ -62,24 +62,27 @@ const int pb2 = A3;
 const int potentiometer = A1;
 unsigned long start_time, actual_time;
 unsigned long time_elapsed, time_elapsed_in_minute, seconds;
+unsigned long last_second = 99;
 unsigned long beep_timer = 0;
 unsigned long restart_time;
+int zigzag_num = random(1 , 254);
+int zigzag_way = random(0 , 1);
 
 int rgb_led_pin_list[] = { 11, 10, 9 };
 int color_change_list[] = { 0, 20, 25 }; //1 change per minute only.
 const int color_set[3][3] =  { //must have item here per each item in color_change_list
          {
                 255, //r
-                0,  //g
+                1,  //g
                 0,  //b
          },
          {
-                150, //r
-                150,  //g
+                255, //r
+                255,  //g
                 0,  //b
          },
          {
-                0,  //r
+                1,  //r
                 255,  //g
                 0,  //b
          }};
@@ -131,7 +134,27 @@ void update_timers() {
   time_elapsed = actual_time - start_time;
   time_elapsed_in_minute = time_elapsed / minute;
   seconds = ( time_elapsed - (time_elapsed_in_minute * minute) ) /1000;
+  if (seconds != last_second) {
+    last_second = seconds;
+    on_change_second();
+  }
+  zigzag();  
 }
+
+void on_change_second() {
+}
+
+void zigzag() {
+  if (zigzag_way) {
+    zigzag_num += 1;
+  } else {
+    zigzag_num -= 1;
+  }
+  if (zigzag_num <= 0 || zigzag_num >=250) {
+    zigzag_way = zigzag_way == 1 ? 0 : 1;
+  }
+}
+
 
 void check_display_brightness() {
   display_brightness = constrain(
@@ -148,14 +171,19 @@ void check_buttons() {
   }
 }
 
+int random_if_zero( int color_set ) {
+  return color_set == 0 ? random(0, 20): color_set;
+}
+int zigzag_num_if_zero( int color_set ) {
+  return color_set == 0 ? constrain(map(zigzag_num, 0, 255, 0, 200), 0, 200): color_set;
+}
+
+
 void check_leds() {
   for (change = 0; change < (sizeof(color_change_list)/sizeof(int)); change++) {
     if (time_elapsed_in_minute >= color_change_list[change])
        for (color = 0; color < (sizeof(rgb_led_pin_list)/sizeof(int)); color++)
-         analogWrite(rgb_led_pin_list[color], color_set[change][color]);
-    else
-       for (color = 0; color < (sizeof(rgb_led_pin_list)/sizeof(int)); color++)
-         analogWrite(rgb_led_pin_list[color], LOW);
+         analogWrite(rgb_led_pin_list[color], zigzag_num_if_zero(color_set[change][color]) );
   }
 }
 
